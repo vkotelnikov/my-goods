@@ -1,0 +1,5 @@
+<tr *ngFor="let item of itemsList" [routerLink]="['/item/',item.id]">
+    <td>ID: {{item.id}}</td>
+    <td>Name: {{item.name}}</td>
+    <td>Date: {{item.createdAt | date:'shortDate'}}</td>
+</tr>

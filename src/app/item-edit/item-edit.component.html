@@ -1,0 +1,12 @@
+<form #form="ngForm" (ngSubmit)="onSubmit(form)">
+    <p><label for="id">ID: </label>
+    <span>{{editableItem.id}}</span><br/></p>
+    <p><label for="name">Name: </label>
+    <input type="text" #name="ngModel" id="name" name="name" [(ngModel)]="editableItem.name" required minlength="3">
+    <span *ngIf="name.errors">Name is too short</span><br/></p>
+    <p><label for="id">Date: </label>
+    <input type="date" id="date" name="date" [(ngModel)]="editableItem.createdAt"><br/></p>
+    
+<!-- <button type="submit" mat-button [routerLink]="['/item', editableItem.id ]">Confirm</button> -->
+<button [disabled]="form.invalid" type="submit" mat-button >Confirm</button>
+</form>

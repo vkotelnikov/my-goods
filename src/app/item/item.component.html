@@ -1,0 +1,5 @@
+<p>ID: {{item.id}}</p>
+<p>Name: {{item.name}}</p>
+<p>Date: {{item.createdAt | date:'shortDate'}}</p>
+<button mat-button (click)="edit()">Edit</button>
+<button mat-button [routerLink]="['/list']">Back to list</button>
