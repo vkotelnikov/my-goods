@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgModel, NgForm } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { WinnerDialogComponent } from '../winner-dialog/winner-dialog.component';
 
 @Component({
   selector: 'app-play-field',
@@ -19,16 +21,21 @@ export class PlayFieldComponent implements OnInit {
 
   steps: number = 0;
 
-  constructor() { }
+  constructor(public dialog: MatDialog) { }
+
+  openDialog() {
+    this.dialog.open(WinnerDialogComponent, {
+      data: {
+        winner: this.winner
+      }
+    }).afterClosed().subscribe(e => this.reset());
+  }
 
   ngOnInit(): void {
     console.log(this.field);
   }
 
-  // process(value: HTMLTableCellElement) { 
   process(value) {
-    // console.log(value);
-    // console.log( value.target.attributes['row'].value );
     let cell: HTMLTableCellElement = value.target;
     console.log(value);
     let row = cell.getAttribute('row');
@@ -47,12 +54,10 @@ export class PlayFieldComponent implements OnInit {
   }
 
   checkForWinner() {
-    // console.log('first row: ' + this.checkHorizontals());
     if (this.checkHorizontals()
       || this.checkVerticals()
       || this.checkDiagonals() ) {
-      alert(this.winner + ' win');
-      this.reset();
+        this.openDialog();
     }
 
     if (this.field.every((value, index, arr) => {
@@ -65,12 +70,17 @@ export class PlayFieldComponent implements OnInit {
     }
   }
 
+  ok(){
+    this.reset();
+  }
+
   reset() {
     this.field = [["", "", ""], ["", "", ""], ["", "", ""]];
     this.steps = 0;
     this.winner = null;
     this.xTurn = true;
   }
+  
 
   checkHorizontals(): boolean {
     let result = false;
