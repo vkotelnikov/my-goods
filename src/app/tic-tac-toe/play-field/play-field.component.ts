@@ -8,7 +8,7 @@ import { NgModel, NgForm } from '@angular/forms';
 })
 export class PlayFieldComponent implements OnInit {
 
-  field: string[][] = [["","",""], ["","",""], ["","",""]];
+  field: string[][] = [["", "", ""], ["", "", ""], ["", "", ""]];
 
   xTurn: boolean = true;
 
@@ -37,52 +37,104 @@ export class PlayFieldComponent implements OnInit {
       this.field[row][col] = this.xTurn ? this.X : this.O;
       value.nodeValue = this.xTurn ? this.X : this.O;
       this.steps++;
-      if(this.steps > 5){
+      this.switchSides();
+      if (this.steps > 4) {
         this.checkForWinner();
       }
 
-      this.switchSides();
     }
     console.log(this.field);
   }
 
-  checkForWinner(){
+  checkForWinner() {
     // console.log('first row: ' + this.checkHorizontals());
-    if ( this.checkHorizontals() ) {
-      alert(this.winner + 'win');
+    if (this.checkHorizontals()
+      || this.checkVerticals()
+      || this.checkDiagonals() ) {
+      alert(this.winner + ' win');
+      this.reset();
+    }
+
+    if (this.field.every((value, index, arr) => {
+      return value.every((value, index, arr) => {
+        return value !== "";
+      });
+    })) {
+      alert('Draw. Restart.');
       this.reset();
     }
   }
 
   reset() {
-    this.field = [["","",""], ["","",""], ["","",""]];
+    this.field = [["", "", ""], ["", "", ""], ["", "", ""]];
     this.steps = 0;
     this.winner = null;
     this.xTurn = true;
   }
 
-  checkHorizontals() : boolean{
-    let firstHit : string = null;
+  checkHorizontals(): boolean {
     let result = false;
     for (let i = 0; i < this.field.length && !result; i++) {
       result = this.field[i].every((value, index, arr) => {
-        if( index == 0 ) {
+        if (index == 0) {
           return true;
         } else {
-          return ( ( value=== this.O || value === this.X ) && value === arr[0] ); 
+          return ((value === this.O || value === this.X) && value === arr[0]);
         }
-       });
-       if( result ) 
-       this.winner = this.field[i][0];
+      });
+      if (result)
+        this.winner = this.field[i][0];
     }
-    // result = this.field[0].every((value, index, arr) => {
-    //   if( index == 0 ) {
-    //     return true;
-    //   } else {
-    //     return ( ( value=== this.O || value === this.X ) && value === arr[0] ); 
-    //   }
-    //  });
-    
+
+    return result;
+  }
+
+  checkVerticals(): boolean {
+    let result = false;
+    for (let i = 0; i < this.field.length && !result; i++) {
+      let temp: string[] = [this.field[0][i], this.field[1][i], this.field[2][i]];
+
+      result = temp.every((value, index, arr) => {
+        if (index == 0) {
+          return true;
+        } else {
+          return ((value === this.O || value === this.X) && value === arr[0]);
+        }
+      });
+      if (result)
+        this.winner = this.field[0][i];
+    }
+
+    return result;
+  }
+
+  checkDiagonals(): boolean {
+    let result = false;
+    let main: string[] = [this.field[0][0], this.field[1][1], this.field[2][2]];
+
+    result = main.every((value, index, arr) => {
+      if (index == 0) {
+        return true;
+      } else {
+        return ((value === this.O || value === this.X) && value === arr[0]);
+      }
+    });
+    if (result) {
+      this.winner = this.field[0][0];
+    } else {
+      let secondary: string[] = [this.field[0][2], this.field[1][1], this.field[2][0]];
+
+      result = secondary.every((value, index, arr) => {
+        if (index == 0) {
+          return true;
+        } else {
+          return ((value === this.O || value === this.X) && value === arr[0]);
+        }
+      });
+      if (result)
+        this.winner = this.field[0][2];
+    }
+
     return result;
   }
 
