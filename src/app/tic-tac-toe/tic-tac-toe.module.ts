@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatTableModule } from "@angular/material/table";
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'; 
 import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
 import { ScoreboardComponent } from './scoreboard/scoreboard.component';
 
@@ -20,7 +21,8 @@ const materialComponents = [
   MatCardModule,
   MatButtonModule,
   MatDialogModule,
-  MatTableModule
+  MatTableModule,
+  MatSlideToggleModule
 ]
 
 @NgModule({

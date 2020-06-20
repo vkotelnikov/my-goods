@@ -3,6 +3,7 @@
     <td class="info">
       <h1>Tic Tac Toe</h1>
       <p>Turn of player {{xTurn?'X':'O'}}</p>
+      <mat-slide-toggle [checked]="aiOn" [(ngModel)]="aiOn" (change)="aiStateChanged()" color="primary">Enable AI</mat-slide-toggle>
     </td>
     <td><table class="play-field">
       <tr>

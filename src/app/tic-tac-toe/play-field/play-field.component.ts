@@ -18,6 +18,10 @@ export class PlayFieldComponent implements OnInit {
 
   xTurn: boolean = true;
 
+  //AI plays as player O
+  aiOn: boolean = false;
+  waitingForAi: boolean = false;
+
   readonly X: string = "X";
   readonly O: string = "O";
 
@@ -26,7 +30,7 @@ export class PlayFieldComponent implements OnInit {
   steps: number = 0;
 
   constructor(public dialog: MatDialog,
-              private logger: GameLogService ) { }
+    private logger: GameLogService) { }
 
   openDialog() {
     this.dialog.open(WinnerDialogComponent, {
@@ -39,59 +43,98 @@ export class PlayFieldComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.field);
     try {
-      this.log = JSON.parse( this.logger.getCookie("log") );
-     } catch (e) {
-       console.log(e);
-       this.log = [];
-     }
+      this.log = JSON.parse(this.logger.getCookie("log"));
+    } catch (e) {
+      console.log(e);
+      this.log = [];
+    }
   }
 
   process(value) {
+    if (this.waitingForAi) {
+      return;
+    }
     let cell: HTMLTableCellElement = value.target;
     console.log(value);
     let row = cell.getAttribute('row');
     let col = cell.getAttribute('col');
     if (!this.field[row][col]) {
       this.field[row][col] = this.xTurn ? this.X : this.O;
-      value.nodeValue = this.xTurn ? this.X : this.O;
       this.steps++;
       this.switchSides();
       if (this.steps > 4) {
         this.checkForWinner();
       }
 
+      if ((!this.xTurn && this.aiOn) && this.winner == null) {
+        this.aiTurn();
+      }
+
     }
     console.log(this.field);
   }
 
+  aiTurn() {
+    this.waitingForAi = true;
+    let selectedCell = null;
+    let row = null;
+    let col = null;
+    let trials = 0;
+    while (selectedCell !== "" && trials < 9) {
+      row = this.getRandomInt(0, 3);
+      col = this.getRandomInt(0, 3);
+      selectedCell = this.field[row][col];
+      trials++;
+    }
+    this.field[row][col] = this.xTurn ? this.X : this.O;
+    this.steps++;
+    this.switchSides();
+    if (this.steps > 4) {
+      this.checkForWinner();
+    }
+    this.waitingForAi = false;
+  }
+
+  aiStateChanged() {
+    this.reset();
+  }
+
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+  }
+
+
   checkForWinner() {
     if (this.checkHorizontals()
       || this.checkVerticals()
-      || this.checkDiagonals() ) {
-        
-        let newEntry : LogEntry = { date: new Date(), winner: this.winner };
-        if ( this.log.length >= 10 ) {
-          this.log.pop();
-          this.log.unshift(newEntry);
-        } else {
-          this.log.unshift(newEntry);
-        }
-        this.logger.setCookie("log", JSON.stringify(this.log), 1);
-        // this.logger.setCookie("log")
-        this.openDialog();
-    }
+      || this.checkDiagonals()) {
 
-    if (this.field.every((value, index, arr) => {
-      return value.every((value, index, arr) => {
-        return value !== "";
-      });
-    })) {
-      alert('Draw. Restart.');
-      this.reset();
+      let newEntry: LogEntry = { date: new Date(), winner: this.winner };
+      if (this.log.length >= 10) {
+        this.log.pop();
+        this.log.unshift(newEntry);
+      } else {
+        this.log.unshift(newEntry);
+      }
+      this.logger.setCookie("log", JSON.stringify(this.log), 1);
+      // this.logger.setCookie("log")
+      this.openDialog();
+    } else {
+
+      if (this.field.every((value, index, arr) => {
+        return value.every((value, index, arr) => {
+          return value !== "";
+        });
+      })) {
+        alert('Draw. Restart.');
+        this.reset();
+      }
     }
   }
 
-  ok(){
+  ok() {
     this.reset();
   }
 
@@ -100,8 +143,9 @@ export class PlayFieldComponent implements OnInit {
     this.steps = 0;
     this.winner = null;
     this.xTurn = true;
+    this.waitingForAi = false;
   }
-  
+
 
   checkHorizontals(): boolean {
     let result = false;
