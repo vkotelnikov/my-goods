@@ -7,7 +7,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatTableModule } from "@angular/material/table";
 import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
+import { ScoreboardComponent } from './scoreboard/scoreboard.component';
 
 const ticTacToeRoutes : Routes = [ 
   { path: 'tic-tac-toe', component: PlayFieldComponent }
@@ -17,11 +19,12 @@ const materialComponents = [
   MatToolbarModule,
   MatCardModule,
   MatButtonModule,
-  MatDialogModule
+  MatDialogModule,
+  MatTableModule
 ]
 
 @NgModule({
-  declarations: [PlayFieldComponent, WinnerDialogComponent],
+  declarations: [PlayFieldComponent, WinnerDialogComponent, ScoreboardComponent],
   imports: [
     CommonModule,
     FormsModule,

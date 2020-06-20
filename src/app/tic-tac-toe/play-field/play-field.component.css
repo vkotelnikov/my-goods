@@ -1,19 +1,27 @@
 h1 {
-    text-align: center;
-  }
-  td {
-    width: 100px;
-    height: 100px;
-    text-align: center;
-  }
-  table {
-    margin: 5px auto;
-  }
-  .vert {
-    border-left: 2px solid black;
-    border-right: 2px solid black;
-  }
-  .hori {
-    border-top: 2px solid black;
-    border-bottom: 2px solid black;
-  }
+  text-align: start;
+}
+
+.play-field td {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+}
+
+.play-field table {
+  margin: 5px auto;
+}
+
+.play-field .vert {
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+}
+
+.play-field .hori {
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.info{
+  vertical-align: top;
+}

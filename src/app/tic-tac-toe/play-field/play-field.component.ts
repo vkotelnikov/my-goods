@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgModel, NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { WinnerDialogComponent } from '../winner-dialog/winner-dialog.component';
+import { GameLogService } from '../services/game-log.service';
+import { LogEntry } from '../services/log-entry';
 
 @Component({
   selector: 'app-play-field',
@@ -9,6 +11,8 @@ import { WinnerDialogComponent } from '../winner-dialog/winner-dialog.component'
   styleUrls: ['./play-field.component.css']
 })
 export class PlayFieldComponent implements OnInit {
+
+  log: Array<LogEntry>;
 
   field: string[][] = [["", "", ""], ["", "", ""], ["", "", ""]];
 
@@ -21,7 +25,8 @@ export class PlayFieldComponent implements OnInit {
 
   steps: number = 0;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog,
+              private logger: GameLogService ) { }
 
   openDialog() {
     this.dialog.open(WinnerDialogComponent, {
@@ -33,6 +38,12 @@ export class PlayFieldComponent implements OnInit {
 
   ngOnInit(): void {
     console.log(this.field);
+    try {
+      this.log = JSON.parse( this.logger.getCookie("log") );
+     } catch (e) {
+       console.log(e);
+       this.log = [];
+     }
   }
 
   process(value) {
@@ -57,6 +68,16 @@ export class PlayFieldComponent implements OnInit {
     if (this.checkHorizontals()
       || this.checkVerticals()
       || this.checkDiagonals() ) {
+        
+        let newEntry : LogEntry = { date: new Date(), winner: this.winner };
+        if ( this.log.length >= 10 ) {
+          this.log.pop();
+          this.log.unshift(newEntry);
+        } else {
+          this.log.unshift(newEntry);
+        }
+        this.logger.setCookie("log", JSON.stringify(this.log), 1);
+        // this.logger.setCookie("log")
         this.openDialog();
     }
 

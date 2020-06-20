@@ -1,0 +1,9 @@
+<h2>Last 10 games</h2>
+<table>
+    <tr><th>№</th><th>Time</th><th>Winner</th></tr>
+    <tr *ngFor="let game of log; index as i">
+        <td>{{i + 1}}</td>
+        <td>{{game.date | date:'short'}}</td>
+        <td>{{game.winner}}</td>
+    </tr>
+</table>
