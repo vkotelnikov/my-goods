@@ -119,7 +119,6 @@ export class PlayFieldComponent implements OnInit {
         this.log.unshift(newEntry);
       }
       this.logger.setCookie("log", JSON.stringify(this.log), 1);
-      // this.logger.setCookie("log")
       this.openDialog();
     } else {
 

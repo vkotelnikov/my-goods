@@ -7,16 +7,13 @@
     <a mat-button class="toolbar-item" routerLink="/list">List of Goods</a>
     <a mat-button class="toolbar-item" routerLink="/tic-tac-toe">Tic Tac Toe</a>
   </div>
-  <!-- <div *ngIf="authenticated()">
-    <span class="toolbar-item">|</span>
-    <a mat-button  class="toolbar-item" routerLink="/list">List</a>
-    <a mat-button class="toolbar-item" routerLink="/new-item">New item</a>
-    <a mat-button class="toolbar-item" (click)="logout()">Logout</a>
+  <span class="toolbar-space"></span>
+  <div>
+    <a mat-button class="toolbar-item" target="_blank" href="https://github.com/vkotelnikov/my-goods">
+      <img class="logo" src="../assets/resources/img/github-mark.png"/>
+      <span>vkotelnikov/my-goods</span>
+    </a>
   </div>
-  <div *ngIf="!authenticated()">
-    <a mat-button class="toolbar-item" routerLink="/register">Register</a>
-    <a mat-button class="toolbar-item" routerLink="/login">Login</a>
-  </div> -->
 </mat-toolbar>
 <mat-drawer-container>
   <mat-drawer mode="side"></mat-drawer>

@@ -13,16 +13,10 @@ import { LogEntry } from '../services/log-entry';
 export class ScoreboardComponent implements OnInit {
 
   @Input('log') log: Array<LogEntry>;
-  // log : Array<LogEntry>;
 
   constructor(private logger: GameLogService) { }
 
   ngOnInit(): void {
-    // try {
-    // this.log = JSON.parse( this.logger.getCookie("log") );
-    // } catch ( e ){
-    //   console.log('log is empty');
-    // }
   }
 
 }
