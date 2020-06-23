@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NgModel, NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { WinnerDialogComponent } from '../winner-dialog/winner-dialog.component';
 import { GameLogService } from '../services/game-log.service';
-import { LogEntry } from '../services/log-entry';
 
 @Component({
   selector: 'app-play-field',
@@ -12,69 +10,58 @@ import { LogEntry } from '../services/log-entry';
 })
 export class PlayFieldComponent implements OnInit {
 
-  log: Array<LogEntry>;
-
-  field: string[][] = [["", "", ""], ["", "", ""], ["", "", ""]];
-
-  xTurn: boolean = true;
+  field: string[][];
 
   //AI plays as player O
-  aiOn: boolean = false;
-  waitingForAi: boolean = false;
-
-  readonly X: string = "X";
-  readonly O: string = "O";
+  aiOn = false;
 
   winner: string;
 
-  steps: number = 0;
+  private steps: number = 0;
+  private waitingForAi: boolean = false;
+  private xTurn: boolean = true;
+  private readonly X: string = "X";
+  private readonly O: string = "O";
 
   constructor(public dialog: MatDialog,
-    private logger: GameLogService) { }
+    public gameLogger: GameLogService) { }
 
-  openDialog() {
-    this.dialog.open(WinnerDialogComponent, {
-      data: {
-        winner: this.winner
+  private openDialog() {
+    this.dialog.open(WinnerDialogComponent,
+      {
+        data: { winner: this.winner }
       }
-    }).afterClosed().subscribe(e => this.reset());
+    ).afterClosed().subscribe(e => this.reset());
   }
 
   ngOnInit(): void {
-    console.log(this.field);
-    try {
-      this.log = JSON.parse(this.logger.getCookie("log"));
-    } catch (e) {
-      console.log(e);
-      this.log = [];
-    }
+    this.field = [["", "", ""], ["", "", ""], ["", "", ""]];
   }
 
   process(value) {
-    if (this.waitingForAi) {
+    if (this.isWaitingForAi()) {
       return;
     }
     let cell: HTMLTableCellElement = value.target;
-    console.log(value);
     let row = cell.getAttribute('row');
     let col = cell.getAttribute('col');
     if (!this.field[row][col]) {
-      this.field[row][col] = this.xTurn ? this.X : this.O;
+      this.field[row][col] = this.whoseTurn();
       this.steps++;
       this.switchSides();
-      if (this.steps > 4) {
-        this.checkForWinner();
-      }
+      
+      this.checkForWinner();
 
       if ((!this.xTurn && this.aiOn) && this.winner == null) {
         this.aiTurn();
+        this.checkForWinner();
+        this.switchSides();
       }
 
     }
-    console.log(this.field);
   }
 
-  aiTurn() {
+  private aiTurn() {
     this.waitingForAi = true;
     let selectedCell = null;
     let row = null;
@@ -86,12 +73,8 @@ export class PlayFieldComponent implements OnInit {
       selectedCell = this.field[row][col];
       trials++;
     }
-    this.field[row][col] = this.xTurn ? this.X : this.O;
+    this.field[row][col] = this.whoseTurn();
     this.steps++;
-    this.switchSides();
-    if (this.steps > 4) {
-      this.checkForWinner();
-    }
     this.waitingForAi = false;
   }
 
@@ -99,7 +82,15 @@ export class PlayFieldComponent implements OnInit {
     this.reset();
   }
 
-  getRandomInt(min, max) {
+  private isWaitingForAi(): boolean {
+    return this.waitingForAi;
+  }
+
+  whoseTurn(): string {
+    return this.xTurn ? this.X : this.O;
+  }
+
+  private getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
@@ -107,18 +98,14 @@ export class PlayFieldComponent implements OnInit {
 
 
   checkForWinner() {
+    if ( this.steps < 5 ) {
+      return;
+    }
     if (this.checkHorizontals()
       || this.checkVerticals()
       || this.checkDiagonals()) {
 
-      let newEntry: LogEntry = { date: new Date(), winner: this.winner };
-      if (this.log.length >= 10) {
-        this.log.pop();
-        this.log.unshift(newEntry);
-      } else {
-        this.log.unshift(newEntry);
-      }
-      this.logger.setCookie("log", JSON.stringify(this.log), 1);
+      this.gameLogger.putWinner(this.winner, new Date());
       this.openDialog();
     } else {
 
@@ -133,11 +120,7 @@ export class PlayFieldComponent implements OnInit {
     }
   }
 
-  ok() {
-    this.reset();
-  }
-
-  reset() {
+  private reset() {
     this.field = [["", "", ""], ["", "", ""], ["", "", ""]];
     this.steps = 0;
     this.winner = null;
@@ -145,8 +128,7 @@ export class PlayFieldComponent implements OnInit {
     this.waitingForAi = false;
   }
 
-
-  checkHorizontals(): boolean {
+  private checkHorizontals(): boolean {
     let result = false;
     for (let i = 0; i < this.field.length && !result; i++) {
       result = this.field[i].every((value, index, arr) => {
@@ -163,7 +145,7 @@ export class PlayFieldComponent implements OnInit {
     return result;
   }
 
-  checkVerticals(): boolean {
+  private checkVerticals(): boolean {
     let result = false;
     for (let i = 0; i < this.field.length && !result; i++) {
       let temp: string[] = [this.field[0][i], this.field[1][i], this.field[2][i]];
@@ -182,7 +164,7 @@ export class PlayFieldComponent implements OnInit {
     return result;
   }
 
-  checkDiagonals(): boolean {
+  private checkDiagonals(): boolean {
     let result = false;
     let main: string[] = [this.field[0][0], this.field[1][1], this.field[2][2]];
 
@@ -212,7 +194,7 @@ export class PlayFieldComponent implements OnInit {
     return result;
   }
 
-  switchSides() {
+  private switchSides() {
     this.xTurn = !this.xTurn;
   }
 

@@ -1,36 +1,37 @@
 import { Injectable } from '@angular/core';
+import { LogEntry } from './log-entry';
+import { LocalStorageService } from 'src/app/services/local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameLogService {
 
-  constructor() { }
+  constructor( private localStorage: LocalStorageService ) {}
 
-  public getCookie(name: string) : any {
-    let ca: Array<string> = document.cookie.split(';');
-    let caLen: number = ca.length;
-    let cookieName = `${name}=`;
-    let c: string;
-
-    for (let i: number = 0; i < caLen; i += 1) {
-      c = ca[i].replace(/^\s+/g, '');
-      if (c.indexOf(cookieName) == 0) {
-        return c.substring(cookieName.length, c.length);
-      }
+  getLog() : Array<LogEntry>{
+    let log = JSON.parse( this.localStorage.get('log') );
+    if ( !log ) {
+      return [];
     }
-    return '';
+    return log;
+  } 
+
+  putWinner( winner: string, time : Date ) {
+    let newEntry : LogEntry = { winner: winner, date: time };
+    this.putLogEntry( newEntry );
   }
 
-  public deleteCookie(name) {
-    this.setCookie(name, "", -1);
+  putLogEntry( newEntry : LogEntry ) {
+    // let log :Array<LogEntry>  = this.getLog();
+    let log = this.getLog();
+    if (log.length >= 10) {
+      log.pop();
+      log.unshift(newEntry);
+    } else {
+      log.unshift(newEntry);
+    }
+    this.localStorage.set('log', JSON.stringify(log));
   }
-
-  public setCookie(name: string, value: string, expireDays: number, path: string = "") {
-    let d: Date = new Date();
-    d.setTime(d.getTime() + expireDays * 24 * 60 * 60 * 1000);
-    let expires: string = "expires=" + d.toUTCString();
-    let sameSite: string = "SameSite=None; Secure";
-    document.cookie = name + "=" + value + "; " + expires + (path.length > 0 ? "; path=" + path : "") + "; " + sameSite;
-  }
+  
 }

@@ -13,8 +13,4 @@ export class WinnerDialogComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  ok(){
-
-  }
-
 }

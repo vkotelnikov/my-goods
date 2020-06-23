@@ -2,30 +2,24 @@
   <tr>
     <td class="info">
       <h1>Tic Tac Toe</h1>
-      <p>Turn of player {{xTurn?'X':'O'}}</p>
+      <p>Turn of player {{whoseTurn()}}</p>
       <mat-slide-toggle [checked]="aiOn" [(ngModel)]="aiOn" (change)="aiStateChanged()" color="primary">Enable AI
       </mat-slide-toggle>
     </td>
     <td>
       <table class="play-field">
-        <tr>
-          <td row="0" col="0" (click)="process($event)">{{field[0][0]}}</td>
-          <td row="0" col="1" (click)="process($event)" class="vert">{{field[0][1]}}</td>
-          <td row="0" col="2" (click)="process($event)">{{field[0][2]}}</td>
-        </tr>
-        <tr>
-          <td row="1" col="0" (click)="process($event)" class="hori">{{field[1][0]}}</td>
-          <td row="1" col="1" (click)="process($event)" class="vert hori">{{field[1][1]}}</td>
-          <td row="1" col="2" (click)="process($event)" class="hori">{{field[1][2]}}</td>
-        </tr>
-        <tr>
-          <td row="2" col="0" (click)="process($event)">{{field[2][0]}}</td>
-          <td row="2" col="1" (click)="process($event)" class="vert">{{field[2][1]}}</td>
-          <td row="2" col="2" (click)="process($event)">{{field[2][2]}}</td>
+        <tr *ngFor="let rowItem of field; let row = index; let oddRow = odd">
+          <td [attr.row]="row" 
+              [attr.col]="col" 
+              [ngClass]="{vert: oddCol, hori: oddRow}"
+              (click)="process($event)" 
+              *ngFor="let colItem of field[row]; let col = index; let oddCol = odd">
+              {{field[row][col]}}
+          </td>
         </tr>
       </table>
     </td>
     <td class="info">
-      <app-scoreboard [log]="log"></app-scoreboard>
+      <app-scoreboard [log]="gameLogger.getLog()"></app-scoreboard>
     </td>
   </tr>

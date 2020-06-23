@@ -37,7 +37,6 @@ export class XhrInterceptor implements HttpInterceptor {
       headers: req.headers.set('X-Requested-With', 'XMLHttpRequest')
       
     });
-    console.log('request intercepted');
     return next.handle(xhr);
   }
 }
